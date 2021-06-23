@@ -18,7 +18,7 @@ func Unpack(s string) (string, error) {
 	case 1:
 		t := NewToken(runes[0])
 		if t.state != suspended {
-			return "", nil
+			return "", ErrInvalidString
 		}
 		return t.String(), nil
 	}
@@ -57,7 +57,10 @@ func Unpack(s string) (string, error) {
 		}
 	}
 
-	if tokenCurrent.state != done {
+	switch tokenCurrent.state {
+	case invalid, escaped:
+		return "", ErrInvalidString
+	case suspended:
 		tokenCurrent.Freeze()
 		tokens = append(tokens, tokenCurrent)
 	}
