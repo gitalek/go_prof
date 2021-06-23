@@ -29,18 +29,18 @@ func Unpack(s string) (string, error) {
 	tokens := make([]*Token, 0, runesLength)
 	tokenCurrent := NewToken(prev)
 
-	for _, cur := range rest {
+	for _, r := range rest {
 		switch tokenCurrent.state {
 		case invalid:
 			return "", ErrInvalidString
 		case done:
-			tokenCurrent = NewToken(cur)
+			tokenCurrent = NewToken(r)
 		case escaped:
-			tokenCurrent.Set(cur)
+			tokenCurrent.Set(r)
 		case suspended:
 			switch {
-			case unicode.IsDigit(cur):
-				times, err := strconv.Atoi(string(cur))
+			case unicode.IsDigit(r):
+				times, err := strconv.Atoi(string(r))
 				if err != nil {
 					return "", err
 				}
@@ -50,7 +50,7 @@ func Unpack(s string) (string, error) {
 			default:
 				tokenCurrent.Freeze()
 				tokens = append(tokens, tokenCurrent)
-				tokenCurrent = NewToken(cur)
+				tokenCurrent = NewToken(r)
 			}
 		default:
 			continue
