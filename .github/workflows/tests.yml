@@ -23,8 +23,6 @@ jobs:
 
       - name: go get
         run: |
-          go clean -modcache
-          echo $GITHUB_ENV
           cd /tmp && go get -v "github.com/${GITHUB_REPOSITORY}/${BRANCH}@${BRANCH}"
 
   lint:
