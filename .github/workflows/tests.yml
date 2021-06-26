@@ -24,6 +24,7 @@ jobs:
       - name: go get
         run: |
           go clean -modcache
+          rm /home/runner/go/pkg/mod/*
           cd /tmp && go get -v "github.com/${GITHUB_REPOSITORY}/${BRANCH}@${BRANCH}"
 
   lint:
