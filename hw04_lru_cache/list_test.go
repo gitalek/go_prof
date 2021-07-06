@@ -15,7 +15,7 @@ func TestList(t *testing.T) {
 		require.Nil(t, l.Back())
 	})
 
-	t.Run("#1", func(t *testing.T) {
+	t.Run("single-element list", func(t *testing.T) {
 		l := NewList()
 		l.PushFront(1)
 
@@ -24,7 +24,7 @@ func TestList(t *testing.T) {
 		require.Equal(t, 1, l.Front().Value)
 	})
 
-	t.Run("#2", func(t *testing.T) {
+	t.Run("remove from single-element list", func(t *testing.T) {
 		l := NewList()
 		l.PushFront(1)
 		element := l.Front()
