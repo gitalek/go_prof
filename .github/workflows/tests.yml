@@ -22,7 +22,8 @@ jobs:
           go-version: ^1.16
 
       - name: go get
-        run: cd /tmp && go get -v "github.com/${GITHUB_REPOSITORY}/${BRANCH}@${BRANCH}"
+        run: |
+          cd /tmp && go get -v "github.com/${GITHUB_REPOSITORY}/${BRANCH}@${BRANCH}"
 
   lint:
     runs-on: ubuntu-latest
