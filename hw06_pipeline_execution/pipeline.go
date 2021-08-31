@@ -17,19 +17,24 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 }
 
 func stageMid(in In, done In, stage Stage) Out {
+	inStage := stage(in)
 	out := make(Bi)
 	go func() {
 		defer func() {
 			close(out)
+			for range inStage {}
 		}()
-		for v := range in {
+		for {
 			select {
 			case <-done:
 				return
-			default:
+			case v, ok := <- inStage:
+				if !ok {
+					return
+				}
 				out <- v
 			}
 		}
 	}()
-	return stage(out)
+	return out
 }
