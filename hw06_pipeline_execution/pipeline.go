@@ -22,13 +22,14 @@ func stageMid(in In, done In, stage Stage) Out {
 	go func() {
 		defer func() {
 			close(out)
-			for range inStage {}
+			for range inStage {
+			}
 		}()
 		for {
 			select {
 			case <-done:
 				return
-			case v, ok := <- inStage:
+			case v, ok := <-inStage:
 				if !ok {
 					return
 				}
