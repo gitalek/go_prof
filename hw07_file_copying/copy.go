@@ -40,20 +40,15 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		return err
 	}
 
+	l := limit
 	if limit == 0 {
-		if _, err = io.Copy(dst, src); err != nil {
-			if err == io.EOF {
-				return nil
-			}
-			return err
+		l = srcStat.Size()
+	}
+	if _, err = io.CopyN(dst, src, l); err != nil {
+		if err == io.EOF {
+			return nil
 		}
-	} else {
-		if _, err = io.CopyN(dst, src, limit); err != nil {
-			if err == io.EOF {
-				return nil
-			}
-			return err
-		}
+		return err
 	}
 
 	return nil
