@@ -1,11 +1,12 @@
 package main
 
 import (
-	"testing"
-	"io/ioutil"
 	"bytes"
+	"errors"
+	"io/ioutil"
 	"os"
 	"path"
+	"testing"
 )
 
 func TestCopy(t *testing.T) {
@@ -18,9 +19,9 @@ func TestCopy(t *testing.T) {
 		limit    int64
 	}
 	tests := []struct {
-		name       string
-		args       args
-		wantErr    bool
+		name     string
+		args     args
+		wantErr  bool
 		wantPath string
 	}{
 		{
@@ -31,9 +32,8 @@ func TestCopy(t *testing.T) {
 				offset:   0,
 				limit:    0,
 			},
-			wantErr: false,
-			wantPath:   "./testdata/out_offset0_limit0.txt",
-
+			wantErr:  false,
+			wantPath: "./testdata/out_offset0_limit0.txt",
 		},
 		{
 			name: "offset0_limit10",
@@ -43,9 +43,8 @@ func TestCopy(t *testing.T) {
 				offset:   0,
 				limit:    10,
 			},
-			wantErr: false,
-			wantPath:   "./testdata/out_offset0_limit10.txt",
-
+			wantErr:  false,
+			wantPath: "./testdata/out_offset0_limit10.txt",
 		},
 		{
 			name: "offset0_limit1000",
@@ -55,9 +54,8 @@ func TestCopy(t *testing.T) {
 				offset:   0,
 				limit:    1_000,
 			},
-			wantErr: false,
-			wantPath:   "./testdata/out_offset0_limit1000.txt",
-
+			wantErr:  false,
+			wantPath: "./testdata/out_offset0_limit1000.txt",
 		},
 		{
 			name: "offset0_limit10000",
@@ -67,9 +65,8 @@ func TestCopy(t *testing.T) {
 				offset:   0,
 				limit:    10_000,
 			},
-			wantErr: false,
-			wantPath:   "./testdata/out_offset0_limit10000.txt",
-
+			wantErr:  false,
+			wantPath: "./testdata/out_offset0_limit10000.txt",
 		},
 		{
 			name: "offset100_limit1000",
@@ -79,9 +76,8 @@ func TestCopy(t *testing.T) {
 				offset:   100,
 				limit:    1_000,
 			},
-			wantErr: false,
-			wantPath:   "./testdata/out_offset100_limit1000.txt",
-
+			wantErr:  false,
+			wantPath: "./testdata/out_offset100_limit1000.txt",
 		},
 	}
 	for _, tt := range tests {
@@ -117,9 +113,9 @@ func TestCopy_ErrorCases(t *testing.T) {
 		limit    int64
 	}
 	tests := []struct {
-		name       string
-		args       args
-		wantErr    error
+		name    string
+		args    args
+		wantErr error
 	}{
 		{
 			name: "offset exceeds file size",
@@ -130,7 +126,6 @@ func TestCopy_ErrorCases(t *testing.T) {
 				limit:    10,
 			},
 			wantErr: ErrOffsetExceedsFileSize,
-
 		},
 		{
 			name: "unsupported file: directory",
@@ -141,7 +136,6 @@ func TestCopy_ErrorCases(t *testing.T) {
 				limit:    10,
 			},
 			wantErr: ErrUnsupportedFile,
-
 		},
 		{
 			name: "unsupported file: character device",
@@ -152,14 +146,13 @@ func TestCopy_ErrorCases(t *testing.T) {
 				limit:    10,
 			},
 			wantErr: ErrUnsupportedFile,
-
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			toPath := path.Join(tmpDir, tt.args.toPath)
 			gotErr := Copy(tt.args.fromPath, toPath, tt.args.offset, tt.args.limit)
-			if nil == gotErr || gotErr != tt.wantErr {
+			if nil == gotErr || !errors.Is(gotErr, tt.wantErr) {
 				t.Fatalf("Copy() error = %v, wantErr %v", gotErr, tt.wantErr)
 			}
 		})

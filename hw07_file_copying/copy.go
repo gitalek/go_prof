@@ -2,10 +2,11 @@ package main
 
 import (
 	"errors"
-	"os"
-	"io"
-	"github.com/cheggaaa/pb/v3"
 	"fmt"
+	"io"
+	"os"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 var (
@@ -16,12 +17,12 @@ var (
 func Copy(fromPath, toPath string, offset, limit int64) error {
 	src, err := os.Open(fromPath)
 	if err != nil {
-		return fmt.Errorf("fromPath - %q: %v", fromPath, err)
+		return fmt.Errorf("fromPath - %q: %w", fromPath, err)
 	}
 
 	srcStat, err := src.Stat()
 	if err != nil {
-		return fmt.Errorf("src - %q: %v", fromPath, err)
+		return fmt.Errorf("src - %q: %w", fromPath, err)
 	}
 
 	if !srcStat.Mode().IsRegular() {
@@ -34,12 +35,12 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 
 	_, err = src.Seek(offset, 0)
 	if err != nil {
-		return fmt.Errorf("src - %q offset - %d: %v", fromPath, offset, err)
+		return fmt.Errorf("src - %q offset - %d: %w", fromPath, offset, err)
 	}
 
 	dst, err := os.Create(toPath)
 	if err != nil {
-		return fmt.Errorf("toPath - %q: %v", toPath, err)
+		return fmt.Errorf("toPath - %q: %w", toPath, err)
 	}
 
 	l := limit
@@ -52,7 +53,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	barReader := bar.NewProxyReader(src)
 
 	if _, err = io.CopyN(dst, barReader, l); err != nil {
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return nil
 		}
 		return err
