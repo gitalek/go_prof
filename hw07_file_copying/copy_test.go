@@ -140,7 +140,7 @@ func TestCopy_ErrorCases(t *testing.T) {
 		{
 			name: "unsupported file: character device",
 			args: args{
-				fromPath: "./testdata/device_c",
+				fromPath: "/dev/urandom",
 				toPath:   toPathFilename,
 				offset:   0,
 				limit:    10,
