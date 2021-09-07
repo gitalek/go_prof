@@ -50,13 +50,65 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(5)
+
+		c.Set("aaa", 100)
+		c.Set("bbb", 200)
+
+		_, ok := c.Get("aaa")
+		require.True(t, ok)
+		_, ok = c.Get("bbb")
+		require.True(t, ok)
+
+		c.Clear()
+
+		_, ok = c.Get("aaa")
+		require.False(t, ok)
+		_, ok = c.Get("bbb")
+		require.False(t, ok)
+	})
+
+	t.Run("capacity cause pop", func(t *testing.T) {
+		c := NewCache(3)
+
+		c.Set("aaa", 100)
+		c.Set("bbb", 200)
+		c.Set("ccc", 300)
+		c.Set("ddd", 400)
+
+		_, ok := c.Get("ddd")
+		require.True(t, ok)
+		_, ok = c.Get("ccc")
+		require.True(t, ok)
+		_, ok = c.Get("bbb")
+		require.True(t, ok)
+
+		_, ok = c.Get("aaa")
+		require.False(t, ok)
+	})
+
+	t.Run("lru cause pop", func(t *testing.T) {
+		c := NewCache(3)
+
+		c.Set("aaa", 100)
+		c.Set("bbb", 200)
+		c.Set("ccc", 300)
+		c.Get("aaa")
+		c.Set("ddd", 300)
+
+		_, ok := c.Get("ddd")
+		require.True(t, ok)
+		_, ok = c.Get("aaa")
+		require.True(t, ok)
+		_, ok = c.Get("ccc")
+		require.True(t, ok)
+
+		_, ok = c.Get("bbb")
+		require.False(t, ok)
 	})
 }
 
 func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
-
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
@@ -76,4 +128,14 @@ func TestCacheMultithreading(t *testing.T) {
 	}()
 
 	wg.Wait()
+
+	count := 10
+	for i := 0; i < count; i++ {
+		expected := 1_000_000 - 1 - i
+		key := Key(strconv.Itoa(expected))
+
+		val, ok := c.Get(key)
+		require.True(t, ok)
+		require.Equal(t, expected, val)
+	}
 }
